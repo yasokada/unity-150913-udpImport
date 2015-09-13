@@ -12,8 +12,8 @@ public class ImportScript : MonoBehaviour {
 	
 	public InputField IFipadr;
 	public InputField IFport;
-	public InputField IFmsg; // message to send
 	public Text rcvText; // recieved text
+	public string sendCommand;
 	
 	UdpClient client;
 	int port;
@@ -43,7 +43,7 @@ public class ImportScript : MonoBehaviour {
 		client = new UdpClient ();
 		
 		// send
-		string sendstr = IFmsg.text + System.Environment.NewLine;
+		string sendstr = sendCommand + System.Environment.NewLine;
 		byte[] data = ASCIIEncoding.ASCII.GetBytes (sendstr);
 		client.Client.SendTimeout = 1000; // msec
 
