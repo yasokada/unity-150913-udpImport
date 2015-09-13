@@ -29,7 +29,6 @@ public class ImportScript : MonoBehaviour {
 	}
 
 	bool SendCommand(ref UdpClient client, string ipadr, int port) {
-		// send
 		string sendstr = sendCommand + System.Environment.NewLine;
 		byte[] data = ASCIIEncoding.ASCII.GetBytes (sendstr);
 		client.Client.SendTimeout = 1000; // msec
@@ -45,12 +44,9 @@ public class ImportScript : MonoBehaviour {
 	}
 	
 	void procComm() {
-		int port = getPort();
-		string ipadr = IFipadr.text;
-
 		UdpClient client = new UdpClient ();
 
-		if (SendCommand (ref client, ipadr, port) == false) {
+		if (SendCommand (ref client, (IFipadr.text), getPort()) == false) {
 			return;
 		}
 
