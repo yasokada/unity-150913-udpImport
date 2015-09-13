@@ -8,26 +8,18 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
+/*
+ * v0.1 2015/09/13
+ *  - checked with udpTimeGraph import
+ */ 
+
 public class ImportScript : MonoBehaviour {
 	
 	public InputField IFipadr;
 	public InputField IFport;
 	public Text rcvText; // recieved text
 	public string sendCommand;
-	
-	UdpClient client;
-	int port;
-	string lastRcvd;
-	
-	void Start() {
-	}
-	
-	void Update() {
-	}
-	
-	string getIpadr() {
-		return IFipadr.text;
-	}
+
 	int getPort() {
 		int res = Convert.ToInt16 (IFport.text);
 		if (res < 0) {
@@ -37,10 +29,10 @@ public class ImportScript : MonoBehaviour {
 	}
 	
 	void procComm() {
-		port = getPort();
-		string ipadr = getIpadr ();
-		
-		client = new UdpClient ();
+		int port = getPort();
+		string ipadr = IFipadr.text;
+
+		UdpClient client = new UdpClient ();
 		
 		// send
 		string sendstr = sendCommand + System.Environment.NewLine;
@@ -58,7 +50,7 @@ public class ImportScript : MonoBehaviour {
 		// receive
 		client.Client.ReceiveTimeout = 2000; // msec
 		IPEndPoint remoteIP = new IPEndPoint(IPAddress.Any, 0);
-		lastRcvd = "";
+		string rcvdstr = "";
 
 		while (true) {
 			try {
@@ -68,7 +60,7 @@ public class ImportScript : MonoBehaviour {
 					return;
 				}
 				string text = Encoding.ASCII.GetString (data);
-				lastRcvd += text;
+				rcvdstr += text;
 
 				if (text.Contains("EOT")) {
 					break;
@@ -82,8 +74,8 @@ public class ImportScript : MonoBehaviour {
 		
 		client.Close ();
 
-		if (lastRcvd.Length > 0) {
-			System.IO.File.WriteAllText("import.csv", lastRcvd);
+		if (rcvdstr.Length > 0) {
+			System.IO.File.WriteAllText("import.csv", rcvdstr);
 			rcvText.text = "recvd to csv";
 		}
 	}
