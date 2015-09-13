@@ -27,23 +27,30 @@ public class ImportScript : MonoBehaviour {
 		}
 		return res;
 	}
+
+	bool SendCommand(ref UdpClient client, string ipadr, int port) {
+		// send
+		string sendstr = sendCommand + System.Environment.NewLine;
+		byte[] data = ASCIIEncoding.ASCII.GetBytes (sendstr);
+		client.Client.SendTimeout = 1000; // msec
+		
+		try {
+			client.Send (data, data.Length, ipadr, port);
+		}
+		catch (Exception e) {
+			rcvText.text = "snd:" + e.Message;
+			return false;
+		}
+		return true;
+	}
 	
 	void procComm() {
 		int port = getPort();
 		string ipadr = IFipadr.text;
 
 		UdpClient client = new UdpClient ();
-		
-		// send
-		string sendstr = sendCommand + System.Environment.NewLine;
-		byte[] data = ASCIIEncoding.ASCII.GetBytes (sendstr);
-		client.Client.SendTimeout = 1000; // msec
 
-		try {
-			client.Send (data, data.Length, ipadr, port);
-		}
-		catch (Exception e) {
-			Debug.Log(e.Message);
+		if (SendCommand (ref client, ipadr, port) == false) {
 			return;
 		}
 
@@ -51,18 +58,19 @@ public class ImportScript : MonoBehaviour {
 		client.Client.ReceiveTimeout = 2000; // msec
 		IPEndPoint remoteIP = new IPEndPoint(IPAddress.Any, 0);
 		string rcvdstr = "";
+		byte [] data;
 
 		while (true) {
 			try {
 				data = client.Receive (ref remoteIP);
 				if (data.Length == 0) {
 					Debug.Log("no response");
-					return;
+					break;
 				}
 				string text = Encoding.ASCII.GetString (data);
 				rcvdstr += text;
 
-				if (text.Contains("EOT")) {
+				if (text.Contains("EOT")) { // End of Table
 					break;
 				}
 			} catch (Exception err) {
