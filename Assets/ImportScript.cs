@@ -9,6 +9,8 @@ using System.Net.Sockets;
 using System.Threading;
 
 /*
+ * v0.2 2015/09/13
+ *  - checked with udpMonitor import
  * v0.1 2015/09/13
  *  - checked with udpTimeGraph import
  */ 
