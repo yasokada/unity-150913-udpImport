@@ -20,12 +20,9 @@ public class ImportScript : MonoBehaviour {
 	string lastRcvd;
 	
 	void Start() {
-		IFipadr.text = "192.168.10.";
-		IFport.text = "6000";
 	}
 	
 	void Update() {
-		rcvText.text = lastRcvd;
 	}
 	
 	string getIpadr() {
@@ -48,6 +45,10 @@ public class ImportScript : MonoBehaviour {
 		// send
 		string sendstr = IFmsg.text + System.Environment.NewLine;
 		byte[] data = ASCIIEncoding.ASCII.GetBytes (sendstr);
+		client.Client.SendTimeout = 1000; // msec
+		client.Client.Blocking = false;
+
+		Debug.Log ("send");
 		client.Send (data, data.Length, ipadr, port);
 		
 		// receive
@@ -55,11 +56,14 @@ public class ImportScript : MonoBehaviour {
 		IPEndPoint remoteIP = new IPEndPoint(IPAddress.Any, 0);
 		lastRcvd = "";
 
+		Debug.Log ("recv");
+
 		while (true) {
 			try {
 				data = client.Receive (ref remoteIP);
 				if (data.Length == 0) {
-					continue;
+					Debug.Log("no response");
+					return;
 				}
 				string text = Encoding.ASCII.GetString (data);
 				lastRcvd += text;
@@ -72,6 +76,10 @@ public class ImportScript : MonoBehaviour {
 		}
 		
 		client.Close ();
+
+		if (lastRcvd.Length > 0) {
+			System.IO.File.WriteAllText("import.csv", lastRcvd);
+		}
 
 		Debug.Log ("fin");
 	}
