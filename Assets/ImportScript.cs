@@ -49,8 +49,14 @@ public class ImportScript : MonoBehaviour {
 		client.Client.Blocking = false;
 
 		Debug.Log ("send");
-		client.Send (data, data.Length, ipadr, port);
-		
+		try {
+			client.Send (data, data.Length, ipadr, port);
+		}
+		catch (Exception e) {
+			Debug.Log(e.Message);
+			return;
+		}
+
 		// receive
 		client.Client.ReceiveTimeout = 2000; // msec
 		IPEndPoint remoteIP = new IPEndPoint(IPAddress.Any, 0);
@@ -72,6 +78,8 @@ public class ImportScript : MonoBehaviour {
 					break;
 				}
 			} catch (Exception err) {
+				Debug.Log(err.Message);
+				break;
 			}
 		}
 		
