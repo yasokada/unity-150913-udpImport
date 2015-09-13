@@ -46,7 +46,6 @@ public class ImportScript : MonoBehaviour {
 		string sendstr = IFmsg.text + System.Environment.NewLine;
 		byte[] data = ASCIIEncoding.ASCII.GetBytes (sendstr);
 		client.Client.SendTimeout = 1000; // msec
-		client.Client.Blocking = false;
 
 		Debug.Log ("send");
 		try {
@@ -79,6 +78,7 @@ public class ImportScript : MonoBehaviour {
 				}
 			} catch (Exception err) {
 				Debug.Log(err.Message);
+				rcvText.text = "no response";
 				break;
 			}
 		}
@@ -87,6 +87,7 @@ public class ImportScript : MonoBehaviour {
 
 		if (lastRcvd.Length > 0) {
 			System.IO.File.WriteAllText("import.csv", lastRcvd);
+			rcvText.text = "recvd to csv";
 		}
 
 		Debug.Log ("fin");
