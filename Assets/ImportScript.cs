@@ -54,16 +54,26 @@ public class ImportScript : MonoBehaviour {
 		client.Client.ReceiveTimeout = 2000; // msec
 		IPEndPoint remoteIP = new IPEndPoint(IPAddress.Any, 0);
 		lastRcvd = "";
-		try {
-			data = client.Receive (ref remoteIP);
-			if (data.Length > 0) {
+
+		while (true) {
+			try {
+				data = client.Receive (ref remoteIP);
+				if (data.Length == 0) {
+					continue;
+				}
 				string text = Encoding.ASCII.GetString (data);
-				lastRcvd = text;	
+				lastRcvd += text;
+
+				if (text.Contains("EOT")) {
+					break;
+				}
+			} catch (Exception err) {
 			}
-		} catch (Exception err) {
 		}
 		
 		client.Close ();
+
+		Debug.Log ("fin");
 	}
 	
 	public void onClick() {
