@@ -47,7 +47,6 @@ public class ImportScript : MonoBehaviour {
 		byte[] data = ASCIIEncoding.ASCII.GetBytes (sendstr);
 		client.Client.SendTimeout = 1000; // msec
 
-		Debug.Log ("send");
 		try {
 			client.Send (data, data.Length, ipadr, port);
 		}
@@ -60,8 +59,6 @@ public class ImportScript : MonoBehaviour {
 		client.Client.ReceiveTimeout = 2000; // msec
 		IPEndPoint remoteIP = new IPEndPoint(IPAddress.Any, 0);
 		lastRcvd = "";
-
-		Debug.Log ("recv");
 
 		while (true) {
 			try {
@@ -89,12 +86,9 @@ public class ImportScript : MonoBehaviour {
 			System.IO.File.WriteAllText("import.csv", lastRcvd);
 			rcvText.text = "recvd to csv";
 		}
-
-		Debug.Log ("fin");
 	}
 	
 	public void onClick() {
-		Debug.Log ("on click");
 		procComm ();
 	}
 }
