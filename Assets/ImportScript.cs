@@ -31,8 +31,7 @@ public class ImportScript : MonoBehaviour {
 	bool SendCommand(ref UdpClient client, string ipadr, int port) {
 		string sendstr = sendCommand + System.Environment.NewLine;
 		byte[] data = ASCIIEncoding.ASCII.GetBytes (sendstr);
-		client.Client.SendTimeout = 1000; // msec
-		
+
 		try {
 			client.Send (data, data.Length, ipadr, port);
 		}
@@ -45,13 +44,14 @@ public class ImportScript : MonoBehaviour {
 	
 	void procComm() {
 		UdpClient client = new UdpClient ();
+		client.Client.SendTimeout = 1000; // msec
+		client.Client.ReceiveTimeout = 2000; // msec
 
 		if (SendCommand (ref client, (IFipadr.text), getPort()) == false) {
 			return;
 		}
 
 		// receive
-		client.Client.ReceiveTimeout = 2000; // msec
 		IPEndPoint remoteIP = new IPEndPoint(IPAddress.Any, 0);
 		string rcvdstr = "";
 		byte [] data;
@@ -60,12 +60,10 @@ public class ImportScript : MonoBehaviour {
 			try {
 				data = client.Receive (ref remoteIP);
 				if (data.Length == 0) {
-					Debug.Log("no response");
-					break;
+					break; // no response
 				}
 				string text = Encoding.ASCII.GetString (data);
 				rcvdstr += text;
-
 				if (text.Contains("EOT")) { // End of Table
 					break;
 				}
